@@ -619,6 +619,31 @@ textarea:focus {
   white-space: pre-wrap;
 }
 
+.remote-form {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.remote-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.remote-form label span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.remote-form .button-row {
+  justify-content: stretch;
+}
+
+.remote-form .button-row button {
+  flex: 1;
+}
+
 .checklist {
   display: grid;
   gap: 9px;
@@ -948,6 +973,27 @@ textarea:focus {
     <aside class="inspector">
       <section class="inspector-card">
         <div class="inspector-header">
+          <h2>Mac mini API</h2>
+          <span class="badge neutral" id="connection-state">demo</span>
+        </div>
+        <div class="remote-form">
+          <label>
+            <span>Endpoint</span>
+            <input id="api-endpoint" placeholder="https://travelagent.example.com">
+          </label>
+          <label>
+            <span>API token</span>
+            <input id="api-token" type="password" autocomplete="off" placeholder="Niet opslaan in GitHub">
+          </label>
+          <div class="button-row">
+            <button class="secondary-button" id="save-api-settings-button" type="button">Opslaan</button>
+            <button class="primary-button" id="connect-api-button" type="button">Verbinden</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="inspector-card">
+        <div class="inspector-header">
           <h2>Runstatus</h2>
           <span class="badge neutral" id="job-state">idle</span>
         </div>
@@ -994,7 +1040,9 @@ const state = {
   currentReport: "",
   activeJob: null,
   staticMode: false,
-  staticResults: null
+  staticResults: null,
+  apiBaseUrl: localStorage.getItem("travelAgentApiBaseUrl") || "",
+  apiToken: localStorage.getItem("travelAgentApiToken") || ""
 };
 
 const demoProfile = {
@@ -1131,12 +1179,17 @@ const els = {
   reportView: document.querySelector("#report-view"),
   reportSubtitle: document.querySelector("#report-subtitle"),
   jobState: document.querySelector("#job-state"),
-  jobLog: document.querySelector("#job-log")
+  jobLog: document.querySelector("#job-log"),
+  connectionState: document.querySelector("#connection-state"),
+  apiEndpoint: document.querySelector("#api-endpoint"),
+  apiToken: document.querySelector("#api-token")
 };
 
 function api(path, options = {}) {
-  const headers = options.body ? { "content-type": "application/json", ...(options.headers || {}) } : options.headers;
-  return fetch(path, { ...options, headers }).then(async response => {
+  const headers = { ...(options.headers || {}) };
+  if (options.body) headers["content-type"] = "application/json";
+  if (state.apiToken) headers.authorization = `Bearer ${state.apiToken}`;
+  return fetch(apiUrl(path), { ...options, headers }).then(async response => {
     const contentType = response.headers.get("content-type") || "";
     const payload = contentType.includes("application/json") ? await response.json() : await response.text();
     if (!response.ok) {
@@ -1144,6 +1197,11 @@ function api(path, options = {}) {
     }
     return payload;
   });
+}
+
+function apiUrl(path) {
+  if (!state.apiBaseUrl) return path;
+  return `${state.apiBaseUrl.replace(/\/$/, "")}${path}`;
 }
 
 function escapeHtml(value) {
@@ -1221,6 +1279,18 @@ function renderProfile() {
   els.children.value = children.length;
   els.bedrooms.value = prefs.minimum_bedrooms || 2;
   els.budget.value = prefs.budget_total_accommodation_and_travel_eur || 3000;
+}
+
+function renderConnectionState(label = null, color = null) {
+  if (els.apiEndpoint) els.apiEndpoint.value = state.apiBaseUrl;
+  if (els.apiToken) els.apiToken.value = state.apiToken;
+  const isRemote = Boolean(state.apiBaseUrl);
+  const text = label || (state.staticMode ? "demo" : isRemote ? "remote" : "lokaal");
+  const badgeColor = color || (state.staticMode ? "amber" : isRemote ? "green" : "neutral");
+  if (els.connectionState) {
+    els.connectionState.textContent = text;
+    els.connectionState.className = `badge ${badgeColor}`;
+  }
 }
 
 function renderProviders(selectedIds = []) {
@@ -1504,11 +1574,41 @@ async function refreshAll() {
     api("/api/profile"),
     api("/api/providers")
   ]);
+  state.staticMode = false;
   state.profile = profile;
   state.providers = providers.providers || [];
+  renderConnectionState();
   renderProfile();
   renderProviders();
   await Promise.all([refreshRequests(), refreshRuns()]);
+}
+
+function saveApiSettings() {
+  state.apiBaseUrl = els.apiEndpoint.value.trim().replace(/\/$/, "");
+  state.apiToken = els.apiToken.value.trim();
+  if (state.apiBaseUrl) localStorage.setItem("travelAgentApiBaseUrl", state.apiBaseUrl);
+  else localStorage.removeItem("travelAgentApiBaseUrl");
+  if (state.apiToken) localStorage.setItem("travelAgentApiToken", state.apiToken);
+  else localStorage.removeItem("travelAgentApiToken");
+  renderConnectionState("opgeslagen", "neutral");
+  setJobLog(state.apiBaseUrl ? `API endpoint opgeslagen: ${state.apiBaseUrl}` : "API endpoint gewist.");
+}
+
+async function connectApi() {
+  saveApiSettings();
+  try {
+    await api("/api/health");
+    await refreshAll();
+    const first = state.requests.find(request => request.filename === "denmark-legoland-2026.json") || state.requests[0];
+    if (first) await loadRequest(first.filename);
+    const latestRun = state.runs[0];
+    if (latestRun) await loadRun(latestRun.id);
+    renderConnectionState("verbonden", "green");
+    setJobLog("Verbonden met Mac mini API.", "completed");
+  } catch (error) {
+    renderConnectionState("fout", "red");
+    setJobLog(`Kan niet verbinden met API: ${error.message}`, "failed");
+  }
 }
 
 async function loadRequest(filename) {
@@ -1622,6 +1722,8 @@ function wireEvents() {
     await navigator.clipboard.writeText(state.currentReport);
     setJobLog("Rapport naar klembord gekopieerd.");
   });
+  document.querySelector("#save-api-settings-button").addEventListener("click", saveApiSettings);
+  document.querySelector("#connect-api-button").addEventListener("click", () => connectApi().catch(error => setJobLog(error.message, "failed")));
 
   els.requestList.addEventListener("click", event => {
     const button = event.target.closest("[data-request]");
@@ -1656,6 +1758,7 @@ function wireEvents() {
 
 async function init() {
   wireEvents();
+  renderConnectionState();
   try {
     await refreshAll();
     const denmark = state.requests.find(request => request.filename === "denmark-legoland-2026.json");
@@ -1689,6 +1792,7 @@ function loadStaticDemo(error) {
   }];
   state.staticResults = demoResults;
   state.currentRequestPath = demoRequest.path;
+  renderConnectionState("demo", "amber");
   renderProfile();
   renderProviders(demoRequest.candidate_provider_ids);
   renderRequests();
