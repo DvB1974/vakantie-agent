@@ -1,0 +1,1719 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TravelAgent</title>
+  <style>
+:root {
+  --page: #f4f6f4;
+  --panel: #ffffff;
+  --panel-soft: #f9faf8;
+  --line: #d8ddd7;
+  --line-strong: #bdc8c0;
+  --text: #1d2923;
+  --muted: #64706a;
+  --ink: #111c17;
+  --teal: #0a8377;
+  --teal-soft: #dff3ef;
+  --green: #2e7d4f;
+  --green-soft: #e4f3e9;
+  --amber: #a76404;
+  --amber-soft: #fff0d8;
+  --red: #a83e3e;
+  --red-soft: #fde7e4;
+  --shadow: 0 12px 28px rgba(31, 41, 36, .08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--page);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 252px minmax(690px, 1fr) 318px;
+  grid-template-rows: 58px 1fr;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, .96);
+  padding: 0 18px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.brand {
+  width: 216px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-weight: 760;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--teal);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 820;
+}
+
+.breadcrumbs {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  flex: 1;
+}
+
+.breadcrumbs strong {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-actions,
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button-row.compact {
+  align-items: end;
+}
+
+.icon-button,
+.primary-button,
+.secondary-button {
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.icon-button {
+  width: 36px;
+  padding: 0;
+  font-size: 16px;
+}
+
+.primary-button {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fff;
+  font-weight: 720;
+}
+
+.secondary-button {
+  background: var(--panel-soft);
+}
+
+.sidebar,
+.inspector {
+  grid-row: 2;
+  overflow: auto;
+  background: #fff;
+  padding: 16px 14px;
+}
+
+.sidebar {
+  border-right: 1px solid var(--line);
+}
+
+.inspector {
+  border-left: 1px solid var(--line);
+}
+
+.side-section + .side-section,
+.inspector-card + .inspector-card {
+  margin-top: 18px;
+}
+
+.side-title {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-box,
+.list-item,
+.inspector-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.profile-box {
+  padding: 12px;
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.profile-box strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.stack {
+  display: grid;
+  gap: 8px;
+}
+
+.list-item {
+  width: 100%;
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  color: var(--muted);
+  background: #fff;
+}
+
+.list-item strong {
+  color: var(--text);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-item span {
+  font-size: 12px;
+}
+
+.list-item.active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.main {
+  grid-row: 2;
+  padding: 18px;
+  overflow: auto;
+}
+
+.hero-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+.hero-row h1 {
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: 25px;
+  line-height: 1.18;
+}
+
+.hero-row p {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.segmented {
+  height: 36px;
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.segment {
+  min-width: 92px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 0 12px;
+}
+
+.segment:last-child {
+  border-right: 0;
+}
+
+.segment.active {
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 760;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.panel.hidden {
+  display: none;
+}
+
+.panel-header {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-header h2,
+.inspector-header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.panel-header span {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.form-grid {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field,
+.mini-field {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.field.wide {
+  grid-column: span 2;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.field > span,
+.mini-field > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.mini-field input {
+  width: 96px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  min-height: 39px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 9px 10px;
+  outline: none;
+}
+
+textarea {
+  min-height: 78px;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px rgba(10, 131, 119, .12);
+}
+
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.provider-option {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  color: var(--muted);
+  background: var(--panel-soft);
+}
+
+.provider-option input {
+  width: auto;
+  min-height: 0;
+}
+
+.provider-option strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+
+.status-strip div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 12px;
+}
+
+.status-strip strong {
+  display: block;
+  color: var(--ink);
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.status-strip span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 830px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 11px 12px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  line-height: 1.28;
+}
+
+.data-table th {
+  color: var(--muted);
+  background: var(--panel-soft);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  width: 18%;
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  width: 19%;
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+  width: 15%;
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+  width: 12%;
+}
+
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) {
+  width: 19%;
+}
+
+.data-table th:nth-child(6),
+.data-table td:nth-child(6) {
+  width: 17%;
+}
+
+.empty-cell {
+  color: var(--muted);
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.badge.green {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.badge.amber {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.badge.red {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.badge.neutral {
+  background: #eef1ee;
+  color: var(--muted);
+}
+
+.markdown {
+  padding: 16px;
+  line-height: 1.48;
+  color: var(--text);
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  color: var(--ink);
+}
+
+.markdown h1 {
+  font-size: 22px;
+}
+
+.markdown h2 {
+  margin-top: 22px;
+  font-size: 18px;
+}
+
+.markdown h3 {
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid var(--line);
+  padding: 8px;
+  text-align: left;
+}
+
+.markdown th {
+  background: var(--panel-soft);
+}
+
+.markdown code {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 4px;
+}
+
+.inspector-card {
+  overflow: hidden;
+  background: #fff;
+}
+
+.inspector-header {
+  min-height: 48px;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.log-box {
+  min-height: 188px;
+  max-height: 280px;
+  overflow: auto;
+  margin: 0;
+  padding: 12px;
+  background: #111c17;
+  color: #e8f1ec;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.checklist {
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+}
+
+.checklist div {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.dot.green {
+  background: var(--green);
+}
+
+.dot.amber {
+  background: var(--amber);
+}
+
+.source-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+}
+
+.source-list button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 1180px) {
+  .app-shell {
+    grid-template-columns: 228px minmax(560px, 1fr);
+  }
+
+  .inspector {
+    display: none;
+  }
+
+  .form-grid,
+  .provider-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 780px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 58px auto 1fr;
+  }
+
+  .brand {
+    width: auto;
+  }
+
+  .breadcrumbs {
+    display: none;
+  }
+
+  .sidebar {
+    grid-row: 2;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    max-height: 360px;
+  }
+
+  .main {
+    grid-row: 3;
+    padding: 14px;
+  }
+
+  .hero-row,
+  .form-grid,
+  .provider-grid,
+  .status-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .field.wide {
+    grid-column: auto;
+  }
+
+  .segmented {
+    width: 100%;
+  }
+
+  .segment {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .data-table {
+    min-width: 0;
+  }
+
+  .data-table th:nth-child(2),
+  .data-table td:nth-child(2),
+  .data-table th:nth-child(4),
+  .data-table td:nth-child(4),
+  .data-table th:nth-child(5),
+  .data-table td:nth-child(5),
+  .data-table th:nth-child(6),
+  .data-table td:nth-child(6) {
+    display: none;
+  }
+
+  .data-table th:nth-child(1),
+  .data-table td:nth-child(1) {
+    width: 58%;
+  }
+
+  .data-table th:nth-child(3),
+  .data-table td:nth-child(3) {
+    width: 42%;
+  }
+
+  .top-actions .secondary-button {
+    display: none;
+  }
+}
+
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">T</div>
+        <span>TravelAgent</span>
+      </div>
+      <div class="breadcrumbs">
+        <span>Werkruimte</span>
+        <span>/</span>
+        <strong id="current-title">Nieuwe reis</strong>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="refresh-button" type="button" title="Vernieuwen" aria-label="Vernieuwen">↻</button>
+        <button class="secondary-button" id="list-providers-button" type="button">Providers</button>
+        <button class="primary-button" id="run-button" type="button">Run starten</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <section class="side-section">
+        <div class="side-title">Profiel</div>
+        <div class="profile-box" id="profile-box">
+          <strong>Laden...</strong>
+        </div>
+      </section>
+
+      <section class="side-section">
+        <div class="side-title">Requests</div>
+        <div class="stack" id="request-list"></div>
+      </section>
+
+      <section class="side-section">
+        <div class="side-title">Runs</div>
+        <div class="stack" id="run-list"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section class="hero-row">
+        <div>
+          <h1>Reisagent cockpit</h1>
+          <p>Maak een reisvraag, voeg aanbieders toe, start checks en beoordeel alleen opties met bewijs.</p>
+        </div>
+        <div class="segmented">
+          <button class="segment active" data-tab="builder" type="button">Vraag</button>
+          <button class="segment" data-tab="results" type="button">Resultaten</button>
+          <button class="segment" data-tab="report" type="button">Rapport</button>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" id="builder-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Reisrequest</h2>
+            <span>Basis voor planning, filters en kandidaatselectie</span>
+          </div>
+          <div class="button-row">
+            <button class="secondary-button" id="new-request-button" type="button">Nieuw</button>
+            <button class="secondary-button" id="save-request-button" type="button">Opslaan</button>
+          </div>
+        </div>
+
+        <form class="form-grid" id="request-form">
+          <label class="field wide">
+            <span>Bestandsnaam</span>
+            <input id="filename" name="filename" placeholder="mijn-volgende-reis.json">
+          </label>
+          <label class="field wide">
+            <span>Bestemming of regio</span>
+            <input id="destination" name="destination" required>
+          </label>
+          <label class="field wide">
+            <span>Thema</span>
+            <input id="theme" name="theme" placeholder="strand, natuur, citytrip, ski, rondreis">
+          </label>
+          <label class="field">
+            <span>Reis start</span>
+            <input id="travel-start" name="travelStart" type="date">
+          </label>
+          <label class="field">
+            <span>Verblijf start</span>
+            <input id="start" name="start" type="date" required>
+          </label>
+          <label class="field">
+            <span>Verblijf einde</span>
+            <input id="end" name="end" type="date" required>
+          </label>
+          <label class="field">
+            <span>Max. opties</span>
+            <input id="max-options" name="maxOptions" type="number" min="1" max="12" value="4">
+          </label>
+          <label class="field">
+            <span>Volwassenen</span>
+            <input id="adults" name="adults" type="number" min="1" value="2">
+          </label>
+          <label class="field">
+            <span>Kinderen</span>
+            <input id="children" name="children" type="number" min="0" value="1">
+          </label>
+          <label class="field">
+            <span>Min. slaapkamers</span>
+            <input id="bedrooms" name="bedrooms" type="number" min="1" value="2">
+          </label>
+          <label class="field">
+            <span>Budget</span>
+            <input id="budget" name="budget" type="number" min="0" step="100" value="3000">
+          </label>
+
+          <div class="field full">
+            <span>Ingebouwde providers</span>
+            <div class="provider-grid" id="provider-grid"></div>
+          </div>
+
+          <label class="field full">
+            <span>Kandidaat-URL's</span>
+            <textarea id="candidates" name="candidates" placeholder="https://www.airbnb.com/... | Airbnb | discovery&#10;https://www.glampings.nl/... | Glampings.nl | glamping"></textarea>
+          </label>
+
+          <label class="field full">
+            <span>Notities</span>
+            <textarea id="notes" name="notes"></textarea>
+          </label>
+        </form>
+      </section>
+
+      <section class="panel tab-panel hidden" id="results-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Resultaten</h2>
+            <span id="results-subtitle">Nog geen run geselecteerd</span>
+          </div>
+          <div class="button-row compact">
+            <label class="mini-field">
+              <span>Max kandidaten</span>
+              <input id="run-max-candidates" type="number" min="1" max="12" value="2">
+            </label>
+            <label class="mini-field">
+              <span>Wacht sec.</span>
+              <input id="run-manual-wait" type="number" min="0" max="120" value="0">
+            </label>
+          </div>
+        </div>
+        <div class="status-strip" id="status-strip">
+          <div><strong>0</strong><span>Checks</span></div>
+          <div><strong>0</strong><span>Hard bevestigd</span></div>
+          <div><strong>0</strong><span>Handmatig</span></div>
+          <div><strong>0</strong><span>Afgevallen</span></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Scenario</th>
+                <th>Status</th>
+                <th>Prijs</th>
+                <th>Accommodatie</th>
+                <th>EV/koeling</th>
+              </tr>
+            </thead>
+            <tbody id="checks-body">
+              <tr><td colspan="6" class="empty-cell">Selecteer een run of start een nieuwe check.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel tab-panel hidden" id="report-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Rapport</h2>
+            <span id="report-subtitle">Markdown-output van de geselecteerde run</span>
+          </div>
+          <button class="secondary-button" id="copy-report-button" type="button">Kopieren</button>
+        </div>
+        <article class="markdown" id="report-view">Nog geen rapport geladen.</article>
+      </section>
+    </main>
+
+    <aside class="inspector">
+      <section class="inspector-card">
+        <div class="inspector-header">
+          <h2>Runstatus</h2>
+          <span class="badge neutral" id="job-state">idle</span>
+        </div>
+        <pre class="log-box" id="job-log">Nog geen actieve job.</pre>
+      </section>
+
+      <section class="inspector-card">
+        <div class="inspector-header">
+          <h2>Bewijslijn</h2>
+          <span class="badge amber">MVP</span>
+        </div>
+        <div class="checklist">
+          <div><span class="dot green"></span><span>Request opslaan</span></div>
+          <div><span class="dot green"></span><span>CLI-run starten</span></div>
+          <div><span class="dot amber"></span><span>DOM/screenshot bewijs</span></div>
+          <div><span class="dot amber"></span><span>Harde provider-checkers</span></div>
+        </div>
+      </section>
+
+      <section class="inspector-card">
+        <div class="inspector-header">
+          <h2>Bronnen</h2>
+        </div>
+        <div class="source-list">
+          <button type="button" data-source="Airbnb">Airbnb</button>
+          <button type="button" data-source="Trivago">Trivago</button>
+          <button type="button" data-source="Booking.com">Booking.com</button>
+          <button type="button" data-source="Glamping">Glamping</button>
+          <button type="button" data-source="Landal">Landal</button>
+          <button type="button" data-source="Center Parcs">Center Parcs</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+const state = {
+  profile: null,
+  providers: [],
+  requests: [],
+  runs: [],
+  currentRequestPath: null,
+  currentRunId: null,
+  currentReport: "",
+  activeJob: null,
+  staticMode: false,
+  staticResults: null
+};
+
+const demoProfile = {
+  family: {
+    adults: 2,
+    children: [{ name: "Olivier", age: 8 }]
+  },
+  travel_preferences: {
+    electric_car: true,
+    max_drive_hours_preferred: 6,
+    minimum_bedrooms: 2,
+    budget_total_accommodation_and_travel_eur: 3000
+  }
+};
+
+const demoProviders = [
+  { id: "airbnb", provider: "Airbnb", checker: "manual" },
+  { id: "trivago", provider: "Trivago", checker: "manual" },
+  { id: "booking", provider: "Booking.com", checker: "manual" },
+  { id: "glamping", provider: "Glamping websites", checker: "manual" },
+  { id: "landal", provider: "Landal", checker: "manual" },
+  { id: "center-parcs", provider: "Center Parcs", checker: "manual" }
+];
+
+const demoRequest = {
+  filename: "demo-familievakantie.json",
+  path: "requests/demo-familievakantie.json",
+  destination_query: "Denemarken",
+  theme: "LEGOLAND + westkust",
+  dates: { start: "2026-07-11", end: "2026-07-25" },
+  max_options: 4,
+  candidate_provider_ids: ["airbnb", "glamping", "center-parcs"],
+  candidates_count: 3,
+  scenarios_count: 2
+};
+
+const demoResults = {
+  request: {
+    destination_query: "Denemarken",
+    theme: "LEGOLAND + westkust",
+    dates: { start: "2026-07-11", end: "2026-07-25" }
+  },
+  checks: [
+    {
+      provider: "Lalandia Billund",
+      role: "LEGOLAND basis",
+      scenario_title: "Billund + westkust",
+      status: "hard_confirmed",
+      price_native: { amount: 10471, currency: "DKK" },
+      accommodation: { type: "Nordic Plus 8", bedrooms: 3 },
+      ev_charging: { at_house: false },
+      cooling: {}
+    },
+    {
+      provider: "Airbnb",
+      role: "discovery",
+      scenario_title: "Westkust",
+      status: "manual_verification_required",
+      price_eur: null,
+      accommodation: null,
+      ev_charging: null,
+      cooling: null
+    },
+    {
+      provider: "Glampings.nl",
+      role: "glamping",
+      scenario_title: "Westkust",
+      status: "manual_verification_required",
+      price_eur: null,
+      accommodation: null,
+      ev_charging: null,
+      cooling: null
+    },
+    {
+      provider: "Sol og Strand",
+      role: "vakantiehuizen",
+      scenario_title: "Westkust",
+      status: "unavailable",
+      price_eur: null,
+      accommodation: null,
+      ev_charging: null,
+      cooling: null
+    }
+  ]
+};
+
+const demoReport = `# TravelAgent rapport
+
+**Bestemming:** Denemarken
+**Thema:** LEGOLAND + westkust
+**Periode:** 2026-07-11 t/m 2026-07-25
+**Reizigers:** 2 volwassenen, 1 kind (8 jaar)
+
+## Belangrijkste regel
+
+Geen positief bewijs = niet als beschikbaar presenteren.
+
+## Demo
+
+Deze online GitHub Pages-versie toont de UX en rapportviewer met sampledata. De echte checks draaien lokaal via \`npm run web\`, omdat GitHub Pages geen Node-server, CLI-processen of Playwright-browser kan starten.
+
+## Shortlist
+
+- **Lalandia Billund**: voorbeeld van hard bevestigde API-check.
+- **Airbnb / Trivago / Booking / glamping-sites**: discovery-kandidaten en handmatige evidence-checks.
+- **Directe aanbieders**: beste bron voor harde beschikbaarheid en totaalprijs.
+`;
+
+const els = {
+  currentTitle: document.querySelector("#current-title"),
+  profileBox: document.querySelector("#profile-box"),
+  requestList: document.querySelector("#request-list"),
+  runList: document.querySelector("#run-list"),
+  providerGrid: document.querySelector("#provider-grid"),
+  requestForm: document.querySelector("#request-form"),
+  filename: document.querySelector("#filename"),
+  destination: document.querySelector("#destination"),
+  theme: document.querySelector("#theme"),
+  travelStart: document.querySelector("#travel-start"),
+  start: document.querySelector("#start"),
+  end: document.querySelector("#end"),
+  maxOptions: document.querySelector("#max-options"),
+  adults: document.querySelector("#adults"),
+  children: document.querySelector("#children"),
+  bedrooms: document.querySelector("#bedrooms"),
+  budget: document.querySelector("#budget"),
+  candidates: document.querySelector("#candidates"),
+  notes: document.querySelector("#notes"),
+  runMaxCandidates: document.querySelector("#run-max-candidates"),
+  runManualWait: document.querySelector("#run-manual-wait"),
+  checksBody: document.querySelector("#checks-body"),
+  statusStrip: document.querySelector("#status-strip"),
+  resultsSubtitle: document.querySelector("#results-subtitle"),
+  reportView: document.querySelector("#report-view"),
+  reportSubtitle: document.querySelector("#report-subtitle"),
+  jobState: document.querySelector("#job-state"),
+  jobLog: document.querySelector("#job-log")
+};
+
+function api(path, options = {}) {
+  const headers = options.body ? { "content-type": "application/json", ...(options.headers || {}) } : options.headers;
+  return fetch(path, { ...options, headers }).then(async response => {
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+    if (!response.ok) {
+      throw new Error(payload.error || payload || `HTTP ${response.status}`);
+    }
+    return payload;
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function slug(value) {
+  return String(value || "reis")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    || "reis";
+}
+
+function formatDateRange(dates = {}) {
+  if (!dates.start && !dates.end) return "geen data";
+  return `${dates.start || "?"} t/m ${dates.end || "?"}`;
+}
+
+function statusBadge(status) {
+  const labels = {
+    hard_confirmed: ["Hard bevestigd", "green"],
+    manual_verification_required: ["Handmatig", "amber"],
+    unavailable: ["Niet beschikbaar", "red"],
+    blocked: ["Geblokkeerd", "red"],
+    uncertain: ["Onzeker", "amber"],
+    likely_available: ["Waarschijnlijk", "amber"]
+  };
+  const [label, color] = labels[status] || [status || "Onbekend", "neutral"];
+  return `<span class="badge ${color}">${escapeHtml(label)}</span>`;
+}
+
+function priceLabel(check) {
+  if (check.price_native?.amount && check.price_native?.currency) {
+    const rounded = Math.round(check.price_native.amount).toLocaleString("nl-NL");
+    if (check.price_native.currency === "EUR") return `EUR ${rounded}`;
+    return `${check.price_native.currency} ${rounded}`;
+  }
+  if (check.price_eur) return `EUR ${Number(check.price_eur).toLocaleString("nl-NL")}`;
+  return "-";
+}
+
+function accommodationLabel(check) {
+  if (!check.accommodation) return "-";
+  const bedrooms = check.accommodation.bedrooms ? `${check.accommodation.bedrooms} slpk.` : "slpk. n.t.b.";
+  return `${check.accommodation.type || "Accommodatie"} (${bedrooms})`;
+}
+
+function comfortLabel(check) {
+  const ev = check.ev_charging ? (check.ev_charging.at_house ? "EV bij huis" : "EV n.t.b.") : "EV n.t.b.";
+  const cooling = check.cooling ? (check.cooling.airco ? "airco" : check.cooling.heat_pump ? "warmtepomp" : "koeling n.t.b.") : "koeling n.t.b.";
+  return `${ev}; ${cooling}`;
+}
+
+function renderProfile() {
+  const profile = state.profile;
+  if (!profile) return;
+  const adults = profile.family?.adults ?? 0;
+  const children = profile.family?.children ?? [];
+  const prefs = profile.travel_preferences || {};
+  els.profileBox.innerHTML = `
+    <strong>Denis gezin</strong>
+    <span>${adults} volwassenen, ${children.length} kind${children.length === 1 ? "" : "eren"}</span>
+    <span>EV ${prefs.electric_car ? "ja" : "n.t.b."}, max. ${prefs.max_drive_hours_preferred || "?"} uur per dag</span>
+    <span>Minimaal ${prefs.minimum_bedrooms || "?"} slaapkamers</span>
+    <span>Budget EUR ${(prefs.budget_total_accommodation_and_travel_eur || 0).toLocaleString("nl-NL")}</span>
+  `;
+  els.adults.value = adults || 2;
+  els.children.value = children.length;
+  els.bedrooms.value = prefs.minimum_bedrooms || 2;
+  els.budget.value = prefs.budget_total_accommodation_and_travel_eur || 3000;
+}
+
+function renderProviders(selectedIds = []) {
+  const selected = new Set(selectedIds);
+  els.providerGrid.innerHTML = state.providers.map(provider => `
+    <label class="provider-option">
+      <input type="checkbox" name="provider" value="${escapeHtml(provider.id)}" ${selected.has(provider.id) ? "checked" : ""}>
+      <span><strong>${escapeHtml(provider.provider)}</strong><br>${escapeHtml(provider.checker)}</span>
+    </label>
+  `).join("");
+}
+
+function renderRequests() {
+  if (!state.requests.length) {
+    els.requestList.innerHTML = `<div class="list-item"><strong>Geen requests</strong><span>Maak een nieuwe reisvraag.</span></div>`;
+    return;
+  }
+  els.requestList.innerHTML = state.requests.map(request => `
+    <button class="list-item ${state.currentRequestPath === request.path ? "active" : ""}" type="button" data-request="${escapeHtml(request.filename)}">
+      <strong>${escapeHtml(request.destination_query || request.filename)}</strong>
+      <span>${escapeHtml(request.theme || "-")} · ${escapeHtml(formatDateRange(request.dates))}</span>
+      <span>${request.candidates_count || request.candidate_provider_ids?.length || 0} kandidaten</span>
+    </button>
+  `).join("");
+}
+
+function renderRuns() {
+  if (!state.runs.length) {
+    els.runList.innerHTML = `<div class="list-item"><strong>Geen runs</strong><span>Start een check.</span></div>`;
+    return;
+  }
+  els.runList.innerHTML = state.runs.slice(0, 12).map(run => {
+    const counts = run.status_counts || {};
+    return `
+      <button class="list-item ${state.currentRunId === run.id ? "active" : ""}" type="button" data-run="${escapeHtml(run.id)}">
+        <strong>${escapeHtml(run.destination_query || run.id)}</strong>
+        <span>${escapeHtml(run.theme || "-")} · ${counts.total || 0} checks</span>
+        <span>${counts.hard_confirmed || 0} hard · ${counts.manual_verification_required || 0} handmatig · ${counts.unavailable || 0} afgevallen</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function emptyRequest() {
+  return {
+    destination_query: "",
+    theme: "",
+    dates: { travel_start: "", start: "", end: "" },
+    strategy_preference: "auto",
+    max_options: 4,
+    candidate_provider_ids: [],
+    candidates: [],
+    notes: [
+      "Beschikbaarheid eerst. Geen optie als hard bevestigd markeren zonder positief bewijs."
+    ]
+  };
+}
+
+function fillForm(filename, request) {
+  const dates = request.dates || {};
+  els.filename.value = filename || "";
+  els.destination.value = request.destination_query || "";
+  els.theme.value = request.theme || "";
+  els.travelStart.value = dates.travel_start || "";
+  els.start.value = dates.start || "";
+  els.end.value = dates.end || "";
+  els.maxOptions.value = request.max_options || 4;
+  els.candidates.value = (request.candidates || [])
+    .map(candidate => `${candidate.url || ""} | ${candidate.provider || ""} | ${candidate.role || "custom"}`.trim())
+    .join("\n");
+  els.notes.value = Array.isArray(request.notes) ? request.notes.join("\n") : "";
+  renderProviders(request.candidate_provider_ids || []);
+  els.currentTitle.textContent = request.destination_query || "Nieuwe reis";
+}
+
+function parseCandidates(text) {
+  return String(text || "")
+    .split("\n")
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const [url, provider, role] = line.split("|").map(part => part.trim());
+      let hostname = `kandidaat-${index + 1}`;
+      try {
+        hostname = new URL(url).hostname.replace(/^www\./, "");
+      } catch {
+        hostname = provider || hostname;
+      }
+      return {
+        id: slug(provider || hostname),
+        provider: provider || hostname,
+        role: role || "custom",
+        url,
+        checker: "manual"
+      };
+    });
+}
+
+function selectedProviderIds() {
+  return [...document.querySelectorAll("input[name='provider']:checked")].map(input => input.value);
+}
+
+function buildRequestFromForm() {
+  const request = {
+    destination_query: els.destination.value.trim(),
+    theme: els.theme.value.trim(),
+    dates: {
+      start: els.start.value,
+      end: els.end.value
+    },
+    strategy_preference: "auto",
+    max_options: Number(els.maxOptions.value) || 4,
+    candidate_provider_ids: selectedProviderIds(),
+    candidates: parseCandidates(els.candidates.value),
+    notes: els.notes.value.split("\n").map(line => line.trim()).filter(Boolean)
+  };
+  if (els.travelStart.value) request.dates.travel_start = els.travelStart.value;
+  return request;
+}
+
+async function saveCurrentRequest() {
+  if (state.staticMode) {
+    setJobLog("Online demo: opslaan is lokaal uitgeschakeld. Start de app op je Mac met `npm run web` om requests te bewaren.", "idle");
+    return null;
+  }
+  const request = buildRequestFromForm();
+  if (!request.destination_query || !request.dates.start || !request.dates.end) {
+    setJobLog("Vul minimaal bestemming, startdatum en einddatum in.");
+    return null;
+  }
+  const filename = els.filename.value.trim() || `${slug(request.destination_query)}-${slug(request.theme || "reis")}.json`;
+  const saved = await api("/api/requests", {
+    method: "POST",
+    body: JSON.stringify({ filename, request })
+  });
+  state.currentRequestPath = saved.path;
+  els.filename.value = saved.filename;
+  await refreshRequests();
+  setJobLog(`Opgeslagen: ${saved.path}`);
+  return saved;
+}
+
+function markdownToHtml(markdown) {
+  const lines = String(markdown || "").split("\n");
+  const html = [];
+  let inList = false;
+  let tableLines = [];
+
+  function flushList() {
+    if (inList) {
+      html.push("</ul>");
+      inList = false;
+    }
+  }
+
+  function flushTable() {
+    if (!tableLines.length) return;
+    const rows = tableLines
+      .filter(line => !/^\|[-:|\s]+\|?$/.test(line))
+      .map(line => line.split("|").slice(1, -1).map(cell => cell.trim()));
+    if (rows.length) {
+      html.push("<table>");
+      rows.forEach((row, index) => {
+        if (index === 0) html.push("<thead><tr>");
+        else if (index === 1) html.push("<tbody><tr>");
+        else html.push("<tr>");
+        row.forEach(cell => html.push(`${index === 0 ? "<th>" : "<td>"}${inlineMarkdown(cell)}${index === 0 ? "</th>" : "</td>"}`));
+        html.push(index === 0 ? "</tr></thead>" : "</tr>");
+      });
+      if (rows.length > 1) html.push("</tbody>");
+      html.push("</table>");
+    }
+    tableLines = [];
+  }
+
+  for (const line of lines) {
+    if (line.startsWith("|")) {
+      flushList();
+      tableLines.push(line);
+      continue;
+    }
+    flushTable();
+    if (!line.trim()) {
+      flushList();
+      continue;
+    }
+    if (line.startsWith("### ")) {
+      flushList();
+      html.push(`<h3>${inlineMarkdown(line.slice(4))}</h3>`);
+    } else if (line.startsWith("## ")) {
+      flushList();
+      html.push(`<h2>${inlineMarkdown(line.slice(3))}</h2>`);
+    } else if (line.startsWith("# ")) {
+      flushList();
+      html.push(`<h1>${inlineMarkdown(line.slice(2))}</h1>`);
+    } else if (line.startsWith("- ")) {
+      if (!inList) {
+        html.push("<ul>");
+        inList = true;
+      }
+      html.push(`<li>${inlineMarkdown(line.slice(2))}</li>`);
+    } else {
+      flushList();
+      html.push(`<p>${inlineMarkdown(line)}</p>`);
+    }
+  }
+  flushTable();
+  flushList();
+  return html.join("");
+}
+
+function inlineMarkdown(text) {
+  return escapeHtml(text)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2" target="_blank" rel="noreferrer">$1</a>`);
+}
+
+function renderChecks(results) {
+  const checks = results?.checks || [];
+  const counts = checks.reduce((acc, check) => {
+    acc.total += 1;
+    acc[check.status] = (acc[check.status] || 0) + 1;
+    return acc;
+  }, { total: 0, hard_confirmed: 0, manual_verification_required: 0, unavailable: 0 });
+
+  els.statusStrip.innerHTML = `
+    <div><strong>${counts.total || 0}</strong><span>Checks</span></div>
+    <div><strong>${counts.hard_confirmed || 0}</strong><span>Hard bevestigd</span></div>
+    <div><strong>${counts.manual_verification_required || 0}</strong><span>Handmatig</span></div>
+    <div><strong>${counts.unavailable || 0}</strong><span>Afgevallen</span></div>
+  `;
+
+  els.resultsSubtitle.textContent = results?.request
+    ? `${results.request.destination_query || "Run"} · ${formatDateRange(results.request.dates)}`
+    : "Nog geen run geselecteerd";
+
+  if (!checks.length) {
+    els.checksBody.innerHTML = `<tr><td colspan="6" class="empty-cell">Geen checks in deze run.</td></tr>`;
+    return;
+  }
+
+  els.checksBody.innerHTML = checks.map(check => `
+    <tr>
+      <td><strong>${escapeHtml(check.provider || "-")}</strong><br><span>${escapeHtml(check.role || "")}</span></td>
+      <td>${escapeHtml(check.scenario_title || "-")}</td>
+      <td>${statusBadge(check.status)}</td>
+      <td>${escapeHtml(priceLabel(check))}</td>
+      <td>${escapeHtml(accommodationLabel(check))}</td>
+      <td>${escapeHtml(comfortLabel(check))}</td>
+    </tr>
+  `).join("");
+}
+
+function showTab(name) {
+  document.querySelectorAll(".segment").forEach(button => button.classList.toggle("active", button.dataset.tab === name));
+  document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.add("hidden"));
+  document.querySelector(`#${name}-panel`)?.classList.remove("hidden");
+}
+
+function setJobLog(text, status = "idle") {
+  els.jobLog.textContent = text || "";
+  els.jobState.textContent = status;
+  els.jobState.className = `badge ${status === "completed" ? "green" : status === "failed" ? "red" : status === "running" ? "amber" : "neutral"}`;
+}
+
+async function refreshRequests() {
+  const payload = await api("/api/requests");
+  state.requests = payload.requests || [];
+  renderRequests();
+}
+
+async function refreshRuns() {
+  const payload = await api("/api/runs");
+  state.runs = payload.runs || [];
+  renderRuns();
+}
+
+async function refreshAll() {
+  const [profile, providers] = await Promise.all([
+    api("/api/profile"),
+    api("/api/providers")
+  ]);
+  state.profile = profile;
+  state.providers = providers.providers || [];
+  renderProfile();
+  renderProviders();
+  await Promise.all([refreshRequests(), refreshRuns()]);
+}
+
+async function loadRequest(filename) {
+  if (state.staticMode) {
+    const request = state.requests.find(item => item.filename === filename) || state.requests[0];
+    state.currentRequestPath = request.path;
+    fillForm(request.filename, {
+      destination_query: request.destination_query,
+      theme: request.theme,
+      dates: request.dates,
+      max_options: request.max_options,
+      candidate_provider_ids: request.candidate_provider_ids,
+      candidates: [
+        { url: "https://www.airbnb.com/", provider: "Airbnb", role: "discovery" },
+        { url: "https://www.glampings.nl/", provider: "Glampings.nl", role: "glamping" },
+        { url: "https://www.centerparcs.nl/", provider: "Center Parcs", role: "directe aanbieder" }
+      ],
+      notes: ["Online demo. Echte checks draaien lokaal via npm run web."]
+    });
+    renderRequests();
+    return;
+  }
+  const payload = await api(`/api/requests/${encodeURIComponent(filename)}`);
+  state.currentRequestPath = payload.path;
+  fillForm(payload.filename, payload.request);
+  renderRequests();
+}
+
+async function loadRun(runId) {
+  if (state.staticMode) {
+    state.currentRunId = runId;
+    renderRuns();
+    renderChecks(state.staticResults);
+    state.currentReport = demoReport;
+    els.reportView.innerHTML = markdownToHtml(demoReport);
+    els.reportSubtitle.textContent = "Online demo · sample rapport";
+    showTab("results");
+    return;
+  }
+  state.currentRunId = runId;
+  renderRuns();
+  const [results, report] = await Promise.all([
+    api(`/api/runs/${encodeURIComponent(runId)}/results`),
+    api(`/api/runs/${encodeURIComponent(runId)}/report`)
+  ]);
+  renderChecks(results);
+  state.currentReport = report;
+  els.reportView.innerHTML = markdownToHtml(report);
+  els.reportSubtitle.textContent = `${results.request?.destination_query || runId} · ${formatDateRange(results.request?.dates)}`;
+  showTab("results");
+}
+
+async function startRun() {
+  if (state.staticMode) {
+    setJobLog("Online demo: run starten is uitgeschakeld op GitHub Pages. Gebruik lokaal `npm run web` voor echte CLI-checks.", "idle");
+    showTab("results");
+    return;
+  }
+  const saved = await saveCurrentRequest();
+  if (!saved) return;
+  showTab("results");
+  setJobLog("Run wordt gestart...", "running");
+  const payload = await api("/api/run", {
+    method: "POST",
+    body: JSON.stringify({
+      requestPath: saved.path,
+      maxCandidates: Number(els.runMaxCandidates.value) || 2,
+      manualWait: Number(els.runManualWait.value) || 0,
+      headless: true
+    })
+  });
+  state.activeJob = payload.job;
+  pollJob(payload.job.id);
+}
+
+async function pollJob(jobId) {
+  const payload = await api(`/api/jobs/${encodeURIComponent(jobId)}`);
+  const job = payload.job;
+  state.activeJob = job;
+  setJobLog(`${job.stdout || ""}${job.stderr ? `\nFouten:\n${job.stderr}` : ""}`.trim() || "Run actief...", job.status);
+  if (job.status === "running") {
+    window.setTimeout(() => pollJob(jobId).catch(error => setJobLog(error.message, "failed")), 1200);
+    return;
+  }
+  await refreshRuns();
+  const run = state.runs.find(item => job.runDir?.endsWith(item.id));
+  if (run) await loadRun(run.id);
+}
+
+function wireEvents() {
+  document.querySelectorAll(".segment").forEach(button => {
+    button.addEventListener("click", () => showTab(button.dataset.tab));
+  });
+
+  els.refreshButton = document.querySelector("#refresh-button");
+  els.refreshButton.addEventListener("click", () => refreshAll().catch(error => setJobLog(error.message, "failed")));
+  document.querySelector("#new-request-button").addEventListener("click", () => {
+    state.currentRequestPath = null;
+    fillForm("", emptyRequest());
+    renderRequests();
+    showTab("builder");
+  });
+  document.querySelector("#save-request-button").addEventListener("click", () => saveCurrentRequest().catch(error => setJobLog(error.message, "failed")));
+  document.querySelector("#run-button").addEventListener("click", () => startRun().catch(error => setJobLog(error.message, "failed")));
+  document.querySelector("#list-providers-button").addEventListener("click", () => {
+    const list = state.providers.map(provider => `${provider.id}: ${provider.provider} (${provider.checker})`).join("\n");
+    setJobLog(list || "Geen providers geladen.", "idle");
+  });
+  document.querySelector("#copy-report-button").addEventListener("click", async () => {
+    if (!state.currentReport) return;
+    await navigator.clipboard.writeText(state.currentReport);
+    setJobLog("Rapport naar klembord gekopieerd.");
+  });
+
+  els.requestList.addEventListener("click", event => {
+    const button = event.target.closest("[data-request]");
+    if (!button) return;
+    loadRequest(button.dataset.request).catch(error => setJobLog(error.message, "failed"));
+  });
+
+  els.runList.addEventListener("click", event => {
+    const button = event.target.closest("[data-run]");
+    if (!button) return;
+    loadRun(button.dataset.run).catch(error => setJobLog(error.message, "failed"));
+  });
+
+  document.querySelectorAll("[data-source]").forEach(button => {
+    button.addEventListener("click", () => {
+      const source = button.dataset.source;
+      const urls = {
+        Airbnb: "https://www.airbnb.com/",
+        Trivago: "https://www.trivago.com/",
+        "Booking.com": "https://www.booking.com/",
+        Glamping: "https://www.glampings.nl/",
+        Landal: "https://www.landal.nl/",
+        "Center Parcs": "https://www.centerparcs.nl/"
+      };
+      const current = els.candidates.value.trim();
+      const line = `${urls[source] || "https://"} | ${source} | discovery`;
+      els.candidates.value = current ? `${current}\n${line}` : line;
+      els.candidates.focus();
+    });
+  });
+}
+
+async function init() {
+  wireEvents();
+  try {
+    await refreshAll();
+    const denmark = state.requests.find(request => request.filename === "denmark-legoland-2026.json");
+    const first = denmark || state.requests[0];
+    if (first) await loadRequest(first.filename);
+    const latestRun = state.runs[0];
+    if (latestRun) await loadRun(latestRun.id);
+  } catch (error) {
+    loadStaticDemo(error);
+  }
+}
+
+init().catch(error => setJobLog(error.stack || error.message, "failed"));
+
+function loadStaticDemo(error) {
+  state.staticMode = true;
+  state.profile = demoProfile;
+  state.providers = demoProviders;
+  state.requests = [demoRequest];
+  state.runs = [{
+    id: "online-demo",
+    destination_query: "Denemarken",
+    theme: "LEGOLAND + westkust",
+    dates: demoRequest.dates,
+    status_counts: {
+      total: demoResults.checks.length,
+      hard_confirmed: 1,
+      manual_verification_required: 2,
+      unavailable: 1
+    }
+  }];
+  state.staticResults = demoResults;
+  state.currentRequestPath = demoRequest.path;
+  renderProfile();
+  renderProviders(demoRequest.candidate_provider_ids);
+  renderRequests();
+  renderRuns();
+  fillForm(demoRequest.filename, {
+    destination_query: demoRequest.destination_query,
+    theme: demoRequest.theme,
+    dates: demoRequest.dates,
+    max_options: demoRequest.max_options,
+    candidate_provider_ids: demoRequest.candidate_provider_ids,
+    candidates: [
+      { url: "https://www.airbnb.com/", provider: "Airbnb", role: "discovery" },
+      { url: "https://www.glampings.nl/", provider: "Glampings.nl", role: "glamping" },
+      { url: "https://www.centerparcs.nl/", provider: "Center Parcs", role: "directe aanbieder" }
+    ],
+    notes: ["Online demo. Echte checks draaien lokaal via npm run web."]
+  });
+  renderChecks(demoResults);
+  state.currentReport = demoReport;
+  els.reportView.innerHTML = markdownToHtml(demoReport);
+  els.reportSubtitle.textContent = "Online demo · sample rapport";
+  setJobLog(`GitHub Pages demo actief. Lokale API niet beschikbaar: ${error.message}`, "idle");
+  showTab("results");
+}
+
+</script>
+</body>
+</html>
