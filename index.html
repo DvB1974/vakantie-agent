@@ -1710,7 +1710,7 @@ function loadStaticDemo(error) {
   state.currentReport = demoReport;
   els.reportView.innerHTML = markdownToHtml(demoReport);
   els.reportSubtitle.textContent = "Online demo · sample rapport";
-  setJobLog(`GitHub Pages demo actief. Lokale API niet beschikbaar: ${error.message}`, "idle");
+  setJobLog("GitHub Pages demo actief. De lokale API is online niet beschikbaar; echte checks draaien op je Mac via `npm run web`.", "idle");
   showTab("results");
 }
 
